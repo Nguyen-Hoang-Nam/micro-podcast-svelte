@@ -1,5 +1,6 @@
 <script lang="ts">
     import { openDB } from "idb";
+    import { push } from "svelte-spa-router";
 
     let subscriptor: string = "";
 
@@ -18,7 +19,7 @@
             const storeName = "subscriptions";
             const version = 1;
 
-            fetch("https://micro-podcast.herokuapp.com/rss", {
+            fetch(process.env.API, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -38,7 +39,9 @@
                     const transaction = db.transaction(storeName, "readwrite");
                     const store = transaction.objectStore(storeName);
 
-                    await store.put(data, hashCode(data.title));
+                    store.put(data, hashCode(data.title)).then(() => {
+                        push("/");
+                    });
                 });
         }
     };
